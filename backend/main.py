@@ -24,7 +24,8 @@ from store import resume_store
 from dotenv import load_dotenv
 load_dotenv()
 from services.llm import prepare_resume_context
-
+import os
+print("PORT =", os.getenv("PORT"))
 
 app = FastAPI(title="AI Resume Screener API", version="2.0")
 print("🚀 Backend main.py loaded")
