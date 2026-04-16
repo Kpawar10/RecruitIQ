@@ -3,7 +3,8 @@ AI Resume Screener — FastAPI Backend
 Endpoints: upload, analyze, rank, chat (streaming), analytics
 """
 
-from fastapi import FastAPI, UploadFile, File, Form, HTTPException, Depends
+from fastapi import FastAPI
+from fastapi import UploadFile, File, Form, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
