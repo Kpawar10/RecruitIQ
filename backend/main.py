@@ -27,7 +27,7 @@ from services.llm import prepare_resume_context
 
 
 app = FastAPI(title="AI Resume Screener API", version="2.0")
-
+print("🚀 Backend main.py loaded")
 
 @app.post("/ext/activate")
 async def ignore_extension():
