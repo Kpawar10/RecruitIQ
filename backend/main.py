@@ -23,7 +23,7 @@ from services.rag import ResumeRAG
 from services.auth import create_user, authenticate_user, get_user_by_id, create_token, decode_token
 from store import resume_store
 from dotenv import load_dotenv
-load_dotenv()         
+load_dotenv()          
 from services.llm import prepare_resume_context
 import os
 print("PORT =", os.getenv("PORT"))
