@@ -187,28 +187,69 @@ def _generate_chatgpt_response(question: str, context: str) -> str:
 
 
 async def stream_chat_answer(question: str, context=None, history=None):
-    print("➡️ Using Mock ChatGPT-style responses")
-    print("➡️ Context received type:", type(context))
+    if not client:
+        async for chunk in _stream_mock_chat(question):
+            yield chunk
+        return
 
-    # ✅ FIX: handle list context safely
+    # ✅ Normalize context
     if isinstance(context, list):
-        context = "\n".join(context)
+        context = "\n\n".join(context)
 
-    # ✅ FIX: handle None safely
-    context = context or ""
+    history = history or []
 
-    if not context.strip():
-        response = (
-            "I don't have enough context from the resume to answer this question. "
-            "Could you provide more specific details or ask about a different aspect?"
-        )
-    else:
-        response = _generate_chatgpt_response(question, context)
+    # ✅ Keep last 6 messages (ChatGPT-style memory)
+    history_text = "\n".join([
+        f"{h['role'].upper()}: {h['content']}"
+        for h in history[-6:]
+    ])
 
-    # Stream response
-    for word in response.split(" "):
-        yield word + " "
-        await asyncio.sleep(0.01)
+    # ✅ Strong prompt (this is critical)
+    prompt = f"""
+You are a highly intelligent AI resume assistant.
+
+Your job:
+- Answer questions using resume context
+- Be precise and factual
+- Do NOT hallucinate
+- If missing info → say "Not mentioned in resume"
+
+Conversation:
+{history_text}
+
+Resume Context:
+{context}
+
+User Question:
+{question}
+
+Answer:
+"""
+
+    loop = asyncio.get_running_loop()
+
+    def blocking():
+        try:
+            response = client.models.generate_content(
+                model="gemini-2.0-flash",
+                contents=prompt,
+            )
+            return response.text
+        except Exception as e:
+            print("❌ Gemini Error:", e)
+            return None
+
+    full_text = await loop.run_in_executor(None, blocking)
+
+    if not full_text:
+        async for chunk in _stream_mock_chat(question):
+            yield chunk
+        return
+
+    # ✅ Smooth streaming (token-like)
+    for token in full_text.split(" "):
+        yield token + " "
+        await asyncio.sleep(0.008) 
 # ─── GEMINI IMPLEMENTATION ────────────────────────────────────────────────────
 
 #async def _stream_gemini(prompt):

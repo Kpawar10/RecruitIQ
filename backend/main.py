@@ -15,16 +15,16 @@ import json
 import uuid
 import io
  
-from backend.services.pdf_parser import extract_text_from_pdf
-from backend.services.embeddings import get_embedding, compute_similarity
-from backend.services.skills import extract_skills, SKILLS_LIST
-from backend.services.llm import stream_feedback, stream_chat_answer
-from backend.services.rag import ResumeRAG
-from backend.services.auth import create_user, authenticate_user, get_user_by_id, create_token, decode_token
-from backend.store import resume_store
+from services.pdf_parser import extract_text_from_pdf
+from services.embeddings import get_embedding, compute_similarity
+from services.skills import extract_skills, SKILLS_LIST
+from services.llm import stream_feedback, stream_chat_answer
+from services.rag import ResumeRAG
+from services.auth import create_user, authenticate_user, get_user_by_id, create_token, decode_token
+from store import resume_store
 from dotenv import load_dotenv
 load_dotenv()
-from backend.services.llm import prepare_resume_context
+from services.llm import prepare_resume_context
 import os
 print("PORT =", os.getenv("PORT"))
 import sys
@@ -235,7 +235,7 @@ async def chat_stream(req: ChatRequest):
         entry["rag"] = ResumeRAG(entry["text"])
 
     rag: ResumeRAG = entry["rag"]
-    context = rag.retrieve(req.question, k=4)
+    context = rag.retrieve(req.question, k=6)
 
     async def generator():
         async for chunk in stream_chat_answer(req.question, context, req.history):

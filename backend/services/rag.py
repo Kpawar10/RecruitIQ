@@ -58,7 +58,17 @@ class ResumeRAG:
             q_emb_2d = q_emb.reshape(1, -1)
             faiss.normalize_L2(q_emb_2d)
             D, I = self.index.search(q_emb_2d, min(k, len(self.chunks)))
-            return [self.chunks[i] for i in I[0] if i < len(self.chunks)]
+            results = [self.chunks[i] for i in I[0] if i < len(self.chunks)]
+
+# 🔥 Filter weak chunks
+            filtered = []
+            for chunk in results:
+                if len(chunk.split()) < 20:
+                    continue
+                if any(keyword in chunk.lower() for keyword in ["experience", "project", "skill", "work"]):
+                    filtered.append(chunk)
+
+            return filtered if filtered else results
         else:
             # Numpy fallback
             scores = self.embeddings @ q_emb
