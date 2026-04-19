@@ -247,7 +247,7 @@ Answer:
         return
 
     # ✅ Smooth streaming (token-like) 
-    for token in full_text.split(" "):
+    for token in full_text.split(" "): 
         yield token + " "
         await asyncio.sleep(0.008)  
 # ─── GEMINI IMPLEMENTATION ────────────────────────────────────────────────────
