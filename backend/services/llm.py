@@ -12,12 +12,20 @@ load_dotenv()
 import asyncio
 from typing import AsyncIterator
 from google import genai
-from sentence_transformers import SentenceTransformer
+#from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
 
 # Load embedding model (lightweight + free)
-embedder = SentenceTransformer("all-MiniLM-L6-v2")
+model = None
+
+def get_model():
+    global model
+    if model is None:
+        from sentence_transformers import SentenceTransformer
+        model = SentenceTransformer("all-MiniLM-L6-v2")
+    return model
+
 resume_chunks = []
 resume_embeddings = None
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY", "")
@@ -87,7 +95,7 @@ def prepare_resume_context(resume_text: str):
     resume_chunks = [chunk.strip() for chunk in resume_text.split("\n") if chunk.strip()]
 
     # Create embeddings
-    resume_embeddings = embedder.encode(resume_chunks)
+    resume_embeddings = model.encode(resume_chunks)
 
 
 def get_relevant_context(question: str, top_k: int = 3):
@@ -96,7 +104,7 @@ def get_relevant_context(question: str, top_k: int = 3):
      if not resume_chunks:
          return ""
 
-     question_embedding = embedder.encode([question])
+     question_embedding = model.encode([question])
      scores = cosine_similarity(question_embedding, resume_embeddings)[0]
 
      top_indices = np.argsort(scores)[-top_k:][::-1]

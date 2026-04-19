@@ -31,14 +31,25 @@ import sys
 print(sys.path)
 app = FastAPI(title="AI Resume Screener API", version="2.0")
 print("🚀 Backend main.py loaded")
+model = None
 
+def get_model():
+    global model
+    if model is None:
+        from sentence_transformers import SentenceTransformer
+        model = SentenceTransformer("all-MiniLM-L6-v2")
+    return model
+
+@app.get("/")
+def health():
+    return {"status": "running"}
 @app.post("/ext/activate")
 async def ignore_extension():
     return {"status": "ok"}
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://localhost:3000"],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
