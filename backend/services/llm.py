@@ -249,7 +249,7 @@ Answer:
     # ✅ Smooth streaming (token-like)
     for token in full_text.split(" "):
         yield token + " "
-        await asyncio.sleep(0.008) 
+        await asyncio.sleep(0.008)  
 # ─── GEMINI IMPLEMENTATION ────────────────────────────────────────────────────
 
 #async def _stream_gemini(prompt):
