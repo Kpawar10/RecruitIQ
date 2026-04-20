@@ -32,7 +32,7 @@ _PATTERN = re.compile(
     re.IGNORECASE,
 )
 
-
+ 
 def extract_skills(text: str) -> list[str]:
     """Return lowercase unique skills found in text."""
     matches = _PATTERN.findall(text)
