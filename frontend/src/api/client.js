@@ -1,4 +1,4 @@
-const BASE = 'http://127.0.0.1:8000'
+const BASE =  import.meta.env.VITE_API_URL;
 
 function authHeaders() {
   const token = localStorage.getItem('riq_token')
@@ -16,13 +16,16 @@ async function checkOk(res) {
 }
 
 export async function uploadResume(file) {
-  console.log("API CALLED")
-  const form = new FormData()
-  form.append('file', file)
-  const token = localStorage.getItem('riq_token')
-  const res = await fetch(`${BASE}/upload`, { method: 'POST',headers: token ? { Authorization: `Bearer ${token}` } : {}, body: form })
-  if (!res.ok) throw new Error((await res.json()).detail)
-  return checkOk(res)
+  const formData = new FormData()
+  formData.append("file", file)
+
+  const res = await fetch(`${BASE}/upload`, {
+    method: "POST",
+    body: formData
+  })
+
+   if (!res.ok) throw new Error((await res.json()).detail)
+   return res.json()
 }
 
 export async function analyzeResumes(resumeIds, jobDescription) {
