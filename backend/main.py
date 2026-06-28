@@ -40,7 +40,7 @@ def get_model():
         model = SentenceTransformer("all-MiniLM-L6-v2")
     return model
 
-@app.get("/")
+@app.get("/health")
 def health():
     return {"status": "running"}
 @app.post("/ext/activate")
