@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react'
 
 const AuthContext = createContext(null)
 
-const BASE = '/api'
+const BASE = import.meta.env.VITE_API_URL
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
@@ -39,6 +39,10 @@ export function AuthProvider({ children }) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name, email, password }),
     })
+    const contentType = res.headers.get('content-type')
+  if (!contentType?.includes('application/json')) {
+    throw new Error('Server is waking up, please try again in a few seconds')
+  }
     const data = await res.json()
     if (!res.ok) throw new Error(data.detail || 'Signup failed')
     saveAuth(data.token, data.user)
@@ -51,6 +55,10 @@ export function AuthProvider({ children }) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password }),
     })
+    const contentType = res.headers.get('content-type')
+  if (!contentType?.includes('application/json')) {
+    throw new Error('Server is waking up, please try again in a few seconds')
+  }
     const data = await res.json()
     if (!res.ok) throw new Error(data.detail || 'Login failed')
     saveAuth(data.token, data.user)
